@@ -1,0 +1,16 @@
+# Java / Spring Boot
+target/
+*.class
+.mvn/
+mvnw
+mvnw.cmd
+
+# Python / FastAPI
+venv/
+__pycache__/
+*.pyc
+
+# IDE y Sistema
+.vscode/
+.idea/
+.DS_Store
