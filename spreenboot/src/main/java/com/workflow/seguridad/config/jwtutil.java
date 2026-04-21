@@ -7,14 +7,17 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
 @Component
 public class jwtutil {
 
-// Llave generada para HS256 (En producción, cárgala desde variables de entorno)
-    private final Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    // 1. CAMBIO CRÍTICO: Usa una cadena fija de al menos 32 caracteres.
+    private final String SECRET_STRING = "mi_llave_secreta_super_segura_prochain_2026_uagrm";
+    private final Key SECRET_KEY = Keys.hmacShaKeyFor(SECRET_STRING.getBytes(StandardCharsets.UTF_8));
+    
     private final long EXPIRATION_TIME = 86400000; // 24 horas
 
     public String generarToken(usuario usuario) {
@@ -36,6 +39,8 @@ public class jwtutil {
             parseClaims(token);
             return true;
         } catch (Exception e) {
+            // 2. MEJORA: Imprime por qué falla para no adivinar más
+            System.out.println("Error al validar token: " + e.getMessage());
             return false;
         }
     }
@@ -46,5 +51,9 @@ public class jwtutil {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    public String obtenerRolDeToken(String token) {
+        return parseClaims(token).get("rol", String.class);
     }
 }

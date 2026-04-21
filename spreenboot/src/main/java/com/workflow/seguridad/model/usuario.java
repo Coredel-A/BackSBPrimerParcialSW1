@@ -10,6 +10,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.LocalDateTime;
 
 @Document(collection = "usuarios")
@@ -29,6 +31,7 @@ public class usuario {
     @Indexed(unique = true)
     private String email;
 
+    @JsonIgnore
     private String passwordHash;
 
     // Los roles definidos: "ADMINISTRADOR", "COLABORADOR", "FUNCIONARIO", "CLIENTE"

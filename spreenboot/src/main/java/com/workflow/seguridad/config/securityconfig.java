@@ -1,7 +1,11 @@
 package com.workflow.seguridad.config;
+import com.workflow.seguridad.config.jwtfilter;
+import com.workflow.seguridad.service.authservice;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -12,29 +16,42 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-public class securityconfig {
+public class SecurityConfig {
 
-private final jwtfilter jwtFilter;
+    private final jwtfilter jwtFilter;
+    private final authservice authService;
 
-    public securityconfig(jwtfilter jwtFilter) {
+    public SecurityConfig(jwtfilter jwtFilter, authservice authService) {
         this.jwtFilter = jwtFilter;
+        this.authService = authService;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(csrf -> csrf.disable()) // Desactivamos CSRF (usamos JWT)
+                .cors(cors -> cors.configurationSource(request -> {
+                    var corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
+                    corsConfiguration.setAllowedOrigins(java.util.List.of("http://localhost:4200"));
+                    corsConfiguration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                    corsConfiguration.setAllowedHeaders(java.util.List.of("*"));
+                    corsConfiguration.setAllowCredentials(true);
+                    return corsConfiguration;
+                }))
+                .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/auth/**").permitAll() // Endpoints públicos
-                    .anyRequest().authenticated() // Todo lo demás requiere token
+                    .requestMatchers("/api/auth/**").permitAll()
+                    // Usamos hasAuthority para que coincida exactamente con el String del token
+                    .requestMatchers("/api/users/**").hasAuthority("ADMINISTRADOR") 
+                    .anyRequest().authenticated()
                 )
+                .userDetailsService(authService)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }    
 }
