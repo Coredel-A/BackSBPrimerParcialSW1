@@ -32,11 +32,17 @@ public class usuarioservice {
         return usuarioRepository.save(usuario);
     }
 
-    public usuario updateRol(String id, String nuevoRol) {
-        usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        usuario.setRol(nuevoRol);
-        return usuarioRepository.save(usuario);
+    public usuario updateUsuariocompleto(String id, usuario datosNuevos) {
+        usuario existente = usuarioRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        existente.setNombre(datosNuevos.getNombre());
+        existente.setApellido(datosNuevos.getApellido());
+        existente.setEmail(datosNuevos.getEmail());
+        existente.setRol(datosNuevos.getRol());
+        existente.setActivo(datosNuevos.isActivo());
+        
+        return usuarioRepository.save(existente);
     }
 
     public void deleteUsuario(String id) {

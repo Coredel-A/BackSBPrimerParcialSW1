@@ -16,12 +16,12 @@ public class usuariocontroller {
         this.usuarioService = usuarioService;
     }
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<List<usuario>> getAllUsers() {
         return ResponseEntity.ok(usuarioService.getAllUsuarios());
     }
 
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<usuario> createUser(@RequestBody usuario usuario) {
         try {
             return ResponseEntity.ok(usuarioService.createUsuario(usuario));
@@ -30,10 +30,11 @@ public class usuariocontroller {
         }
     }
 
-    @PutMapping("/{id}/rol")
-    public ResponseEntity<usuario> updateRol(@PathVariable String id, @RequestParam String rol) {
+    @PutMapping("/{id}")
+    public ResponseEntity<usuario> updateUsuario(@PathVariable String id, @RequestBody usuario usuarioDatos) {
         try {
-            return ResponseEntity.ok(usuarioService.updateRol(id, rol));
+            // En tu usuarioService, crea un método que actualice todos los campos
+            return ResponseEntity.ok(usuarioService.updateUsuariocompleto(id, usuarioDatos));
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }

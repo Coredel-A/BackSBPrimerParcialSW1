@@ -48,6 +48,7 @@ public class SecurityConfig {
                     .requestMatchers("/api/auth/**").permitAll()
                     // Usamos hasAuthority para que coincida exactamente con el String del token
                     .requestMatchers("/api/users/**").hasAuthority("ADMINISTRADOR") 
+                    .requestMatchers("/error").permitAll()
                     .anyRequest().authenticated()
                 )
                 .userDetailsService(authService)
