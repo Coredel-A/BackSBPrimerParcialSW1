@@ -35,7 +35,7 @@ public class usuario {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) // CAMBIO AQUÍ
     private String passwordHash;
 
-    // Los roles definidos: "ADMINISTRADOR", "COLABORADOR", "FUNCIONARIO", "CLIENTE"
+    // Los roles definidos: "ADMINISTRADOR", "FUNCIONARIO", "CLIENTE"
     private String rol;
 
     // ID del departamento al que pertenece (opcional para CLIENTE)

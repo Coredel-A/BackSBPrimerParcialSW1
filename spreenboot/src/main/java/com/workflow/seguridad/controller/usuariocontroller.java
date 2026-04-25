@@ -1,5 +1,7 @@
 package com.workflow.seguridad.controller;
 
+import com.workflow.seguridad.dto.usuariorequestdto;
+import com.workflow.seguridad.dto.usuarioresponsedto;
 import com.workflow.seguridad.model.usuario;
 import com.workflow.seguridad.service.usuarioservice;
 import org.springframework.http.ResponseEntity;
@@ -17,36 +19,29 @@ public class usuariocontroller {
     }
 
     @GetMapping
-    public ResponseEntity<List<usuario>> getAllUsers() {
+    public ResponseEntity<List<usuarioresponsedto>> getAll() {
         return ResponseEntity.ok(usuarioService.getAllUsuarios());
     }
 
+    @GetMapping("/por-rol")
+    public ResponseEntity<List<usuarioresponsedto>> getPorRoles(@RequestParam List<String> roles) {
+        return ResponseEntity.ok(usuarioService.listarPorRoles(roles));
+    }
+
     @PostMapping
-    public ResponseEntity<usuario> createUser(@RequestBody usuario usuario) {
-        try {
-            return ResponseEntity.ok(usuarioService.createUsuario(usuario));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<usuarioresponsedto> create(@RequestBody usuariorequestdto dto) {
+        return ResponseEntity.ok(usuarioService.createUsuario(dto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<usuario> updateUsuario(@PathVariable String id, @RequestBody usuario usuarioDatos) {
-        try {
-            // En tu usuarioService, crea un método que actualice todos los campos
-            return ResponseEntity.ok(usuarioService.updateUsuariocompleto(id, usuarioDatos));
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<usuarioresponsedto> update(@PathVariable String id, @RequestBody usuariorequestdto dto) {
+        return ResponseEntity.ok(usuarioService.updateUsuario(id, dto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable String id) {
-        try {
-            usuarioService.deleteUsuario(id);
-            return ResponseEntity.ok().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }    
+    public ResponseEntity<Void> delete(@PathVariable String id) {
+        // Aquí podrías implementar un borrado lógico (activo = false)
+        usuarioService.deleteUsuario(id); 
+        return ResponseEntity.noContent().build();
+    } 
 }

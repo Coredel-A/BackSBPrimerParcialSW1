@@ -1,5 +1,7 @@
 package com.workflow.seguridad.service;
 
+import com.workflow.seguridad.dto.usuariorequestdto;
+import com.workflow.seguridad.dto.usuarioresponsedto;
 import com.workflow.seguridad.model.usuario;
 import com.workflow.seguridad.repository.usuariorepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,31 +20,40 @@ public class usuarioservice {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<usuario> getAllUsuarios() {
-        return usuarioRepository.findAll();
+    public List<usuarioresponsedto> getAllUsuarios() {
+        return usuarioRepository.findAll().stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
-    public usuario createUsuario(usuario usuario) {
-        if (usuarioRepository.existsByEmail(usuario.getEmail())) {
-            throw new RuntimeException("El email ya está registrado.");
-        }
-        // Encriptar la contraseña antes de guardarla en MongoDB
-        usuario.setPasswordHash(passwordEncoder.encode(usuario.getPasswordHash()));
-        usuario.setActivo(true);
-        return usuarioRepository.save(usuario);
+    public List<usuarioresponsedto> listarPorRoles(List<String> roles) {
+        return usuarioRepository.findByRolInAndActivoTrue(roles).stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
-    public usuario updateUsuariocompleto(String id, usuario datosNuevos) {
-        usuario existente = usuarioRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    public usuarioresponsedto createUsuario(usuariorequestdto dto) {
+        usuario user = mapToEntity(dto);
+        // Hasheamos la contraseña antes de guardar
+        user.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
+        return mapToResponse(usuarioRepository.save(user));
+    }
 
-        existente.setNombre(datosNuevos.getNombre());
-        existente.setApellido(datosNuevos.getApellido());
-        existente.setEmail(datosNuevos.getEmail());
-        existente.setRol(datosNuevos.getRol());
-        existente.setActivo(datosNuevos.isActivo());
+    public usuarioresponsedto updateUsuario(String id, usuariorequestdto dto) {
+        usuario user = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         
-        return usuarioRepository.save(existente);
+        user.setNombre(dto.getNombre());
+        user.setApellido(dto.getApellido());
+        user.setRol(dto.getRol());
+        user.setDepartamentoId(dto.getDepartamentoId());
+        
+        // Solo actualizamos contraseña si envían una nueva
+        if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
+            user.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
+        }
+        
+        return mapToResponse(usuarioRepository.save(user));
     }
 
     public void deleteUsuario(String id) {
@@ -51,5 +62,30 @@ public class usuarioservice {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         usuario.setActivo(false);
         usuarioRepository.save(usuario);
+    }
+
+    // Convierte de Entidad a DTO de Respuesta
+    private usuarioresponsedto mapToResponse(usuario user) {
+        return usuarioresponsedto.builder()
+                .id(user.getId())
+                .nombre(user.getNombre())
+                .apellido(user.getApellido())
+                .email(user.getEmail())
+                .rol(user.getRol())
+                .departamentoId(user.getDepartamentoId())
+                .activo(user.isActivo())
+                .build();
+    }
+
+    // Convierte de DTO de Request a Entidad
+    private usuario mapToEntity(usuariorequestdto dto) {
+        return usuario.builder()
+                .nombre(dto.getNombre())
+                .apellido(dto.getApellido())
+                .email(dto.getEmail())
+                .rol(dto.getRol())
+                .departamentoId(dto.getDepartamentoId())
+                .activo(true) // Por defecto activos al crear
+                .build();
     }
 }
