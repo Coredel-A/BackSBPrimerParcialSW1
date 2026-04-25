@@ -1,18 +1,14 @@
-package com.workflow.politicas.model;
+package com.workflow.politicas.dto;
 
 import lombok.Data;
 import java.util.Map;
 
-import org.springframework.data.annotation.Id;
-
 @Data
-public class nodo {
-    @Id
-    private String id;
+public class nodorequestdto {
     private String nombre;
     private String descripcion;
     private String departamentoId;
     private String tipo; // INICIO, FIN, TAREA, DECISION, etc.
-    private Map<String, Double> posicion; // Para guardar x, y de la interfaz visual
+    private Map<String, Double> posicion; 
     private String condicion;    
 }

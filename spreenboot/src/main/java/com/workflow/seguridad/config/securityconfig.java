@@ -37,8 +37,10 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(request -> {
                     var corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
                     corsConfiguration.setAllowedOrigins(java.util.List.of("http://localhost:4200"));
-                    corsConfiguration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                    corsConfiguration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
                     corsConfiguration.setAllowedHeaders(java.util.List.of("*"));
+                    // AÑADE ESTA LÍNEA para que el navegador pueda leer la respuesta
+                    corsConfiguration.setExposedHeaders(java.util.List.of("Authorization")); 
                     corsConfiguration.setAllowCredentials(true);
                     return corsConfiguration;
                 }))
@@ -49,6 +51,7 @@ public class SecurityConfig {
                     // Usamos hasAuthority para que coincida exactamente con el String del token
                     .requestMatchers("/api/users/**").hasAuthority("ADMINISTRADOR") 
                     .requestMatchers("/error").permitAll()
+                    .requestMatchers("/ws/**").permitAll()
                     .anyRequest().authenticated()
                 )
                 .userDetailsService(authService)

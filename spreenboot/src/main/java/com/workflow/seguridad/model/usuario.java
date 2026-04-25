@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;
 
@@ -31,7 +32,7 @@ public class usuario {
     @Indexed(unique = true)
     private String email;
 
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) // CAMBIO AQUÍ
     private String passwordHash;
 
     // Los roles definidos: "ADMINISTRADOR", "COLABORADOR", "FUNCIONARIO", "CLIENTE"
