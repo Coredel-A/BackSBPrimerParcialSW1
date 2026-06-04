@@ -9,5 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class posicionupdatedto {
     private Double x;
-    private Double y;    
+    private Double y;
+    private String departamentoId; // NUEVO: para saber a qué carril pertenece tras mover
 }

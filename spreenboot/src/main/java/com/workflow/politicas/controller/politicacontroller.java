@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.workflow.politicas.dto.*;
-import com.workflow.politicas.model.nodo;
 import com.workflow.politicas.model.conexion;
 
 import java.util.List;
@@ -113,12 +112,31 @@ public class politicacontroller {
     // GUARDAR TODO EL DIAGRAMA (Nodos y Conexiones de golpe)
     @PutMapping("/{id}/diagrama")
     public ResponseEntity<politicas> guardarDiagramaCompleto(
-        @PathVariable String id, 
-        @RequestBody diagramaguardardto diagrama) { // <--- Usa el nombre de tu clase aquí
-    return ResponseEntity.ok(service.actualizarDiagramaCompleto(
-        id, 
-        diagrama.getNodos(), 
-        diagrama.getConexiones()
-    ));
-}
+            @PathVariable String id, 
+            @RequestBody diagramaguardardto diagrama) {
+        return ResponseEntity.ok(service.guardarDiagramaCompleto(
+            id, 
+            diagrama.getNodos(), 
+            diagrama.getConexiones()
+        ));
+    }
+
+    // ACTUALIZAR EL ORDEN COMPLETO DE LOS CARRILES (Para CDK DragDrop del Front)
+    @PutMapping("/{id}/carriles/orden")
+    public ResponseEntity<politicas> actualizarOrdenCarriles(
+            @PathVariable String id, 
+            @RequestBody List<String> nuevoOrden) {
+        
+        // Delegamos al servicio pasándole directamente el ID y la nueva lista
+        return ResponseEntity.ok(service.guardarOrdenCarriles(id, nuevoOrden));
+    }
+
+    // AJUSTAR LA ALTURA DE LOS CARRILES
+    @PutMapping("/{id}/carriles/altura")
+    public ResponseEntity<politicas> actualizarAlturaCarril(
+            @PathVariable String id, 
+            @RequestBody Integer nuevaAltura) {
+        return ResponseEntity.ok(service.ajustarAlturaCarril(id, nuevaAltura));
+    }
+
 }
