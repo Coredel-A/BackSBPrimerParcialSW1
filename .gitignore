@@ -14,3 +14,7 @@ __pycache__/
 .vscode/
 .idea/
 .DS_Store
+
+# Variables de entorno
+.env
+.env.*
